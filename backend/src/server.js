@@ -1,6 +1,7 @@
 import express, { response } from "express"
 import {tagsArray} from "./utils/tags.js"
 import {usuarios} from './testUsuarios.js'
+import { tagsResponse } from "./utils/tagsResponse.js"
 import cors from "cors"
 import mongoose from "mongoose"
 import bcrypt from "bcrypt"
@@ -349,6 +350,59 @@ const followers = await api
 
   return response.status(200).json({followers:followers})
 
+})
+
+app.post("/tags", async(request, response)=>{
+  const  {tag}  = request.body
+  console.log(tag)
+
+  var tagResponse = ''
+
+  if (tag === 'business') {
+    tagResponse = tagsResponse[0]
+  }
+
+  if (tag === "photograph"){
+    tagResponse = tagsResponse[1]
+  }
+
+  if (tag === "video"){
+    tagResponse = tagsResponse[2]
+  }
+
+  if (tag === "music"){
+    tagResponse = tagsResponse[3]
+  }
+
+  if (tag === "education"){
+    tagResponse = tagsResponse[4]
+  }
+
+  if (tag === 'food'){
+    tagResponse = tagsResponse[5]
+  }
+
+  if (tag === 'trip'){
+    tagResponse = tagsResponse[6]
+  }
+
+  if (tag === 'events'){
+    tagResponse = tagsResponse[7]
+  }
+
+  if (tag === 'games'){
+    tagResponse = tagsResponse[8]
+  }
+
+  if (tag === 'artist'){
+    tagResponse = tagsResponse[9]
+  }
+
+  if (tag === 'geek'){
+    tagResponse = tagsResponse[10]
+  }
+
+  return response.status(200).json(tagResponse)
 })
 
 const dbUser = process.env.DB_USER
