@@ -169,7 +169,7 @@ app.post('/auth/login', async(request,response)=>{
 app.post('/auth/register', async(request, response)=>{
 
   const {
-          name, email, password, confirmpassword, city, politic, instagramLink, followers,
+          name, email, password, confirmpassword, city, state, politic, religiosity, instagramLink, followers,
           tags, whatsapp, socialMedias
         } = request.body
 
@@ -198,22 +198,45 @@ app.post('/auth/register', async(request, response)=>{
   const salt = await bcrypt.genSalt(12)
   const passwordHash = await bcrypt.hash(password,salt)
 
-  const user = new User({
+  console.log("reliogisade", religiosity)
+
+  const userData ={
     name,
     email,
     password: passwordHash,
     city,
+    state,
     politic,
+    religiosity,
     instagramLink,
     followers,
     tags,
     whatsapp,
     socialMedias
-  })
+  }
+
+  console.log('userData', userData)
+
+  const user = new User(
+    userData
+
+    // name,
+    // email,
+    // password: passwordHash,
+    // city,
+    // politic,
+    // religiosity,
+    // instagramLink,
+    // followers,
+    // tags,
+    // whatsapp,
+    // socialMedias
+    
+  )
 
   try {
     await user.save()
-
+     console.log(user)
     response.status(201).json({msg:"Create Sucessfull"})
 
   } catch (error) {
@@ -249,7 +272,7 @@ app.get("/users",checkToken, async (request,response)=>{
   // } = request.body
 
   const {
-    city, politic, followers,tags,
+   state, city, politic, followers,tags, religiosity
   } = request.body
 
 var  matriz = [[tagsArray[0]],[],[1]]
@@ -270,7 +293,8 @@ pesoTags=0
 //OUTROS PESOS
 const religiosityWeight = 1
 const politcPreferenceWeight =1
-const queryBrazilianStateWeight = 11
+const queryBrazilianStateWeight = 10
+const cityWeight =10
 const followersWeight = 1
 
 // Preenchimento dos arrays que usarão pra ordenar
@@ -281,13 +305,14 @@ for (let i=0; i<users.length; i++){
 let othersWeight = 0
 names.push(users[i])
 users[i].politic === politic ? othersWeight+= politcPreferenceWeight: ""
-// users[i].religiosity === religiosity ? othersWeight+= religiosityWeight : ""
-// users[i].state === queryBrazilianState ? othersWeight+= queryBrazilianStateWeight : ""
+users[i].religiosity === religiosity ? othersWeight+= religiosityWeight : ""
+users[i].state === state ? othersWeight+= queryBrazilianStateWeight : ""
+users[i].city === city ? othersWeight+= cityWeight : ""
 users[i].followers >= followers ? othersWeight+= followersWeight : ""
 influenzers.push([matriz[1][i]+othersWeight, i])
 
 console.log("Usuario "+ users[i].nome + "  Peso Tags: "+ matriz[1][i] + "  Outros Pesos:  " + othersWeight)
-
+console.log(city)
 }
 
 // ORDENDANDO EM ORDEM DECRESCENTE, OU SEJA O MAIS RELEVANETE PRO MENOS RELEVANTE
