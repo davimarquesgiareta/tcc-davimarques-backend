@@ -13,7 +13,8 @@ const User = mongoose.model('User', {
   followers: Number,
   tags: Array,
   whatsapp: String,
-  socialMedias: Array
+  socialMedias: Array,
+  myInfluencers: Array
 })
 
 export default User

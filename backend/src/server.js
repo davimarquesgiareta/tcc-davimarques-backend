@@ -247,11 +247,12 @@ app.post('/auth/register', async(request, response)=>{
 })
 
 //GET USER
-app.get("/user/:id", checkToken , async (request, response)=>{
+app.get("/user/:email", checkToken , async (request, response)=>{
 
-  const id = request.params.id
+  const email = request.params.email
 
-  const user = await User.findById(id, '-password')
+  // const user = await User.findById(id, '-password')
+  const user = await User.findOne({email: email})
 
   if(!user){
     return response.status(404).json({msg:"User not found"})
@@ -262,7 +263,7 @@ app.get("/user/:id", checkToken , async (request, response)=>{
 })
 
 //GET ALL USERS
-app.get("/users",checkToken, async (request,response)=>{
+app.post("/users",checkToken, async (request,response)=>{
   
   const users = await User.find({}, '-password')
 
@@ -275,6 +276,7 @@ app.get("/users",checkToken, async (request,response)=>{
    state, city, politic, followers,tags, religiosity
   } = request.body
 
+  
 var  matriz = [[tagsArray[0]],[],[1]]
 var pesoTags = 0
 
@@ -428,6 +430,37 @@ app.post("/tags", async(request, response)=>{
   }
 
   return response.status(200).json(tagResponse)
+})
+
+//ADD INFLUENCER
+app.post("/addinfluencer", async(request, response)=>{
+  const { me, influencer} = request.body
+
+  console.log(me + influencer)
+
+  const userInfo = await User.findOne({email: influencer})
+
+  if(!userInfo){
+    return response.status(404).json({msg:"User not found"})
+  }
+
+  const myUser = await User.findOne({email: me})
+  
+  console.log("my user.influencerss", myUser.myInfluencers)
+
+  var arrayInfluencers = [] 
+
+  arrayInfluencers.push(myUser.myInfluencers)
+  arrayInfluencers.push(userInfo)
+
+  console.log("array completo", arrayInfluencers)
+
+  // console.log("o que tem no array", arrayInfluencers)
+
+  const user = await User.updateOne({email:me}, { $set:{myInfluencers : arrayInfluencers}})
+
+  return response.status(200).json({user})
+
 })
 
 const dbUser = process.env.DB_USER
