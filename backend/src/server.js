@@ -448,18 +448,56 @@ app.post("/addinfluencer", async(request, response)=>{
   
   console.log("my user.influencerss", myUser.myInfluencers)
 
-  var arrayInfluencers = [] 
+  // if (userInfo.myInfluencers.length === 0){
+  //   console.log("o que vai", userInfo)
+  //   myUser.myInfluencers.push(userInfo)
+  //   console.log("eu dps de add o influencer", myUser)
+  // }
 
-  arrayInfluencers.push(myUser.myInfluencers)
-  arrayInfluencers.push(userInfo)
+  myUser.myInfluencers.push(userInfo)
 
-  console.log("array completo", arrayInfluencers)
+  // var arrayInfluencers = [] 
+
+  // arrayInfluencers.push(myUser.myInfluencers)
+  // arrayInfluencers.push(userInfo)
+
+  // console.log("array completo", arrayInfluencers)
 
   // console.log("o que tem no array", arrayInfluencers)
 
-  const user = await User.updateOne({email:me}, { $set:{myInfluencers : arrayInfluencers}})
+  const user = await User.updateOne({email:me}, { $set:{myInfluencers : myUser.myInfluencers}})
 
   return response.status(200).json({user})
+
+})
+
+//DELETE INFLUENCER
+app.post("/deleteinfluencer", async(request, response)=>{
+  const { me, emailinfluencer} = request.body
+
+  console.log(me + emailinfluencer)
+
+  const user = await User.findOne({email: me})
+
+  if(!user){
+    return response.status(404).json({msg:"User not found"})
+  }
+
+  var indexDeleteInfluencer = ''
+
+  user.myInfluencers.forEach((element, index) => {
+    if (element.email === emailinfluencer){
+      indexDeleteInfluencer = index
+    }
+  });
+
+  console.log("position", indexDeleteInfluencer)
+
+  user.myInfluencers.splice(indexDeleteInfluencer,1)
+
+  const userUpdated = await User.updateOne({email:me}, { $set:{myInfluencers : user.myInfluencers}})
+
+  return response.status(200).json({userUpdated})
 
 })
 
